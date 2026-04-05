@@ -1,50 +1,53 @@
-const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
+const express = require("express");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const cors = require("cors");
 
+// Load env
+dotenv.config();
+
+// App init
 const app = express();
 
+// Middleware
 app.use(express.json());
-
-// Public route (IMPORTANT FOR DEMO)
-app.get('/', (req, res) => {
-  res.send('🚀 FinSight Backend API is LIVE');
-});
-
-// Public demo route (NO AUTH)
-app.get('/demo', async (req, res) => {
-  const Transaction = require('./src/models/Transaction');
-
-  const data = await Transaction.find().limit(5);
-  res.json(data);
-});
+app.use(cors());
 
 // Routes
-app.use('/api/auth', require('./src/routes/auth'));
-app.use('/api/transactions', require('./src/routes/transactions'));
-app.use('/api/analytics', require('./src/routes/analytics'));
+app.use("/api/auth", require("./src/routes/auth"));
+app.use("/api/transactions", require("./src/routes/transactions"));
+app.use("/api/analytics", require("./src/routes/analytics"));
 
-// DB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('DB Connected'))
-  .catch(err => console.log(err));
-
-// Server
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
+// ✅ Root route (homepage)
 app.get("/", (req, res) => {
-  res.send("FinSight Backend API is running 🚀");
+  res.send(`
+    <h1>🚀 FinSight Backend API</h1>
+    <p>Status: Running ✅</p>
+    <p><a href="/demo">👉 View Demo</a></p>
+  `);
 });
 
+// ✅ Demo route
 app.get("/demo", (req, res) => {
   res.json({
-    message: "FinSight API working",
-    endpoints: [
-      "/api/auth/register",
-      "/api/auth/login",
-      "/api/transactions",
-      "/api/analytics/summary"
-    ]
+    status: "API is working 🚀",
+    endpoints: {
+      register: "/api/auth/register",
+      login: "/api/auth/login",
+      transactions: "/api/transactions",
+      analytics: "/api/analytics/summary"
+    }
   });
+});
+
+// DB Connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("DB Connected"))
+  .catch((err) => console.log(err));
+
+// Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
