@@ -12,13 +12,16 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+// ✅ THESE FIRST
+app.get("/");
+app.get("/demo");
 
 // Routes
 app.use("/api/auth", require("./src/routes/auth"));
 app.use("/api/transactions", require("./src/routes/transactions"));
 app.use("/api/analytics", require("./src/routes/analytics"));
 
-// ✅ Root route (homepage)
+// ✅ Root route
 app.get("/", (req, res) => {
   res.send(`
     <h1>🚀 FinSight Backend API</h1>
